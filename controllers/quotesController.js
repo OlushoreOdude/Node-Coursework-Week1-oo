@@ -7,25 +7,35 @@ const data = {
     this.quotes = data;
   },
 };
-/* 
-imported from helperfunctions
-function pickFromArray(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
- */
 
 const getAllQuotes = (req, res) => {
-  //console.log(data.quotes);
   res.json(data.quotes);
 };
 
 const getRandomQuote = (req, res) => {
   let randomQ = helperFunctions.pickFromArray(data.quotes);
-  console.log(randomQ);
   res.json([randomQ]);
+};
+const getSearchQuote = (req, res) => {
+  let term = req.query.term;
+
+  try {
+    // added optional chaining to mitigate erros
+    const searchResult = data.quotes.filter(
+      (el) =>
+        el.quote.toLocaleLowerCase().includes(term) || el.author?.toLocaleLowerCase().includes(term)
+    );
+
+    console.log(searchResult);
+    res.json([...searchResult]);
+  } catch (err) {
+    console.error(err.stack);
+    res.status(500).send("sorry there was an internal server error");
+  }
 };
 
 module.exports = {
   getAllQuotes,
   getRandomQuote,
+  getSearchQuote,
 };
